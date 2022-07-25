@@ -1,0 +1,59 @@
+version: "3.9"
+   
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+      - redis
+
+  mysql:
+    image: mysql:latest
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    volumes:
+      - "mysql_data:/var/lib/mysql"
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+  
+  redis:
+    image: redis:latest
+    command: --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "6379:6379"
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8080:80
+
+  # celery:
+  #   restart: always
+  #   build:
+  #     context: .
+  #   command: celery -A core worker -l info
+  #   volumes:
+  #     - .:/app
+  #   env_file:
+  #     - ./.env
+  #   depends_on:
+  #     - mysql
+  #     - redis
+  #     - web
+
+volumes:
+  mysql_data: 
