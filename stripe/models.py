@@ -1,9 +1,5 @@
 from enum import Enum
-from operator import mod
-from statistics import mode
 from django.db import models
-from sympy import true
-
 from app.models import App
 
 
