@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from stripe.models import Stripe
+from stripe.models import StripeCredential
+
+admin.site.register(Stripe)
+admin.site.register(StripeCredential)
