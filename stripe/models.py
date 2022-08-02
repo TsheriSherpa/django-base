@@ -21,7 +21,7 @@ class Transaction():
         return True if self.transaction_status == TransactionStatus.COMPLETED else False
 
 
-class Stripe(models.Model, Transaction):
+class StripeTransaction(models.Model, Transaction):
     app = models.ForeignKey(App, on_delete=models.RESTRICT)
     reference_id = models.CharField(max_length=255, unique=True)
     transaction_id = models.CharField(max_length=255, unique=True)
