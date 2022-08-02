@@ -17,10 +17,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import RedirectView
 
+from core import settings
+
+admin.site.site_header = settings.APP_NAME
+admin.site.site_title = 'Payment Service'
+admin.site.index_title = 'Dashboard'
+
 urlpatterns = [
     path('', RedirectView.as_view(url='/admin/', permanent=False)),
     path('admin/', admin.site.urls),
 
     # Api Version 1 (v1)
-    path('api/v1/app', include('app.api.urls'))
+    path('api/v1/app/', include('app.api.urls'))
 ]

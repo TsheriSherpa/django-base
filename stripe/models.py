@@ -1,6 +1,7 @@
 from enum import Enum
 from django.db import models
 from app.models import App
+from stripe.api.serializers.credential_serializer import CredentialSerializer
 
 
 class TransactionStatus(Enum):
@@ -47,3 +48,6 @@ class StripeCredential(models.Model):
     publishable_key = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def serialize(self):
+        return CredentialSerializer(self).data
