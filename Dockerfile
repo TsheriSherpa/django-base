@@ -9,7 +9,11 @@ RUN apk update \
 
 RUN pip install --upgrade pip
 
-RUN addgroup -S docker && adduser -S docker -G docker
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home /app \
+    docker
 
 USER docker
 
@@ -20,9 +24,3 @@ COPY requirements.txt .
 RUN pip install -r ./requirements.txt
 
 COPY . /app
-
-USER root
-
-RUN chown -R docker:docker /app
-
-USER docker
