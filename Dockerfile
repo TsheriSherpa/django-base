@@ -14,6 +14,7 @@ RUN addgroup -S docker && adduser -S docker -G docker
 USER docker
 
 WORKDIR /app
+
 COPY requirements.txt .
 
 RUN pip install -r ./requirements.txt

@@ -14,8 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.views.generic.base import RedirectView
+
+from rest_framework import permissions
+
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 from core import settings
 
@@ -23,9 +28,31 @@ admin.site.site_header = settings.APP_NAME
 admin.site.site_title = 'Payment Service'
 admin.site.index_title = 'Dashboard'
 
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Payment Service API",
+        default_version='v1',
+        description="Payment Service API Docs",
+        terms_of_service="#",
+        contact=openapi.Contact(email="info@newitventure.com"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=[permissions.AllowAny],
+)
+
+
 urlpatterns = [
     path('', RedirectView.as_view(url='/admin/', permanent=False)),
     path('admin/', admin.site.urls),
+
+    # Swagger
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$',
+            schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    re_path(r'^swagger/$', schema_view.with_ui('swagger',
+            cache_timeout=0), name='schema-swagger-ui'),
+    re_path(r'^redoc/$', schema_view.with_ui('redoc',
+            cache_timeout=0), name='schema-redoc'),
 
     # Api Version 1 (v1)
     path('api/v1/app/', include('app.api.urls'))

@@ -19,10 +19,10 @@ class AppCredentialView(generics.GenericAPIView):
     throttle_classes = [UserRateThrottle]
 
     def get(self, request):
-        """Get List Of Payment Available For Given App Id
+        """Get List Of Payment Available For App
 
         Args:
-            app_id (int): id of app
+            request (request): django request
 
         Returns:
             list: list of serialized payment credentials
