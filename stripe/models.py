@@ -31,7 +31,8 @@ class StripeTransaction(models.Model, Transaction):
     status_code = models.CharField(max_length=10)
     remarks = models.CharField(max_length=255)
     transaction_date = models.DateTimeField(auto_now_add=True)
-    email = models.CharField(max_length=255, null=True)
+    customer_email = models.CharField(max_length=255, null=True)
+    customer_name = models.CharField(max_length=255, null=True)
     request_ip = models.CharField(max_length=255, null=True)
     user_agent = models.CharField(max_length=255, null=True)
     is_test = models.BooleanField(

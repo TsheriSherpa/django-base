@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
 from app.api.permissions.authenticated_app import IsAuthenticatedApp
+from khalti.models import KhaltiCredential
 from stripe.models import StripeCredential
 
 
@@ -29,10 +30,16 @@ class AppCredentialView(generics.GenericAPIView):
         """
         payment_credentials = []
         stripe = StripeCredential.objects.filter(
-            app_id=request.app.id).first().serialize()
+            app_id=request.app.id).first()
+
+        khaltis = KhaltiCredential.objects.filter(
+            app_id=request.app.id)
 
         if stripe:
-            payment_credentials.append(stripe)
+            payment_credentials.append(stripe.serialize())
+
+        for khalti in khaltis:
+            payment_credentials.append(khalti.serialize())
 
         return Response({
             'status': True,
