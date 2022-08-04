@@ -9,18 +9,14 @@ RUN apk update \
 
 RUN pip install --upgrade pip
 
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home /app \
-    docker
+RUN adduser -D docker
 
 USER docker
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY requirements.txt /app
 
-RUN pip install -r ./requirements.txt
+RUN pip install --user -r requirements.txt
 
 COPY . /app
