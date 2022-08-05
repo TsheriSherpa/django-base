@@ -1,7 +1,7 @@
 from enum import Enum
 from django.db import models
 from app.models import App
-from stripe.models import Transaction, TransactionStatus
+from stripe.models import Transaction, TransactionStatus, CredentialType
 
 from khalti.api.serializers.credential_serializer import CredentialSerializer
 
@@ -9,7 +9,7 @@ from khalti.api.serializers.credential_serializer import CredentialSerializer
 class KhaltiTransaction(models.Model, Transaction):
     app = models.ForeignKey(App, on_delete=models.RESTRICT)
     reference_id = models.CharField(max_length=255, unique=True)
-    transaction_id = models.CharField(max_length=255, unique=True)
+    transaction_id = models.CharField(max_length=255, unique=True, null=True)
     amount = models.DecimalField(decimal_places=2, max_digits=10)
     transaction_status = models.CharField(
         max_length=255, choices=TransactionStatus.choices())
@@ -21,6 +21,8 @@ class KhaltiTransaction(models.Model, Transaction):
     user_agent = models.CharField(max_length=255, null=True)
     is_test = models.BooleanField(
         default=False, verbose_name="Is test payment?")
+    credential_type = models.CharField(
+        max_length=255, null=True, choices=CredentialType.choices())
     customer_name = models.CharField(max_length=255, null=True)
     customer_phone = models.CharField(max_length=15, null=True)
     meta_data = models.JSONField()
@@ -33,6 +35,10 @@ class KhaltiCredential(models.Model):
     base_url = models.CharField(max_length=255)
     secret_key = models.CharField(max_length=255)
     public_key = models.CharField(max_length=255)
+    credential_type = models.CharField(
+        max_length=255, verbose_name="Credential Used For", null=True)
+    environment = models.CharField(
+        max_length=255, verbose_name="Is test or live?", null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

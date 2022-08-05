@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
 from app.api.permissions.authenticated_app import IsAuthenticatedApp
+from khalti.api.serializers.credential_serializer import CredentialSerializer
 from khalti.models import KhaltiCredential
 from stripe.models import StripeCredential
 
@@ -18,6 +19,7 @@ class AppCredentialView(generics.GenericAPIView):
     """
     authentication_classes = [IsAuthenticatedApp]
     throttle_classes = [UserRateThrottle]
+    serializer_class = CredentialSerializer
 
     def get(self, request):
         """Get List Of Payment Available For App

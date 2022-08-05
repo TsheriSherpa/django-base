@@ -16,6 +16,15 @@ class TransactionStatus(Enum):
         return tuple((i.name, i.value) for i in cls)
 
 
+class CredentialType(Enum):
+    TEST = "TEST"
+    LIVE = "LIVE"
+
+    @classmethod
+    def choices(cls) -> tuple:
+        return tuple((i.name, i.value) for i in cls)
+
+
 class Transaction():
     def isSuccess(self) -> bool:
         return True if self.transaction_status == TransactionStatus.COMPLETED else False
@@ -35,6 +44,8 @@ class StripeTransaction(models.Model, Transaction):
     customer_name = models.CharField(max_length=255, null=True)
     request_ip = models.CharField(max_length=255, null=True)
     user_agent = models.CharField(max_length=255, null=True)
+    credential_type = models.CharField(
+        max_length=255, null=True, choices=CredentialType.choices())
     is_test = models.BooleanField(
         default=False, verbose_name="Is test payment?")
     meta_data = models.JSONField()
@@ -47,6 +58,10 @@ class StripeCredential(models.Model):
     base_url = models.CharField(max_length=255)
     secret_key = models.CharField(max_length=255)
     publishable_key = models.CharField(max_length=255)
+    credential_type = models.CharField(
+        max_length=255, verbose_name="Credential Used For", null=True)
+    environment = models.CharField(
+        max_length=255, verbose_name="Is test or live?", null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

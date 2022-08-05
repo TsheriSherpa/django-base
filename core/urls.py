@@ -51,9 +51,8 @@ urlpatterns = [
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger',
             cache_timeout=0), name='schema-swagger-ui'),
-    re_path(r'^redoc/$', schema_view.with_ui('redoc',
-            cache_timeout=0), name='schema-redoc'),
 
     # Api Version 1 (v1)
-    path('api/v1/app/', include('app.api.urls'))
+    path('api/v1/app/', include('app.api.urls')),
+    path('api/v1/khalti/', include('khalti.api.urls'))
 ]

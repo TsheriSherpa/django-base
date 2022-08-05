@@ -23,7 +23,7 @@ class IsAuthenticatedApp(authentication.BaseAuthentication):
         username = auth.get("username")
         password = auth.get("password")
 
-        app = App.objects.first()
+        app = App.objects.filter(username=username, password=password).first()
         if not app:
             raise exceptions.AuthenticationFailed(('Authentication Failure'))
 
