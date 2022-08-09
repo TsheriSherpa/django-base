@@ -32,7 +32,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'app',
     'khalti',
-    'stripe_card'
+    'stripe_card',
+    'esewa'
 ]
 
 MIDDLEWARE = [
