@@ -1,6 +1,3 @@
-""" Khalti Utilty Class """
-
-
 import requests
 from datetime import datetime
 from khalti.models import KhaltiCredential, KhaltiTransaction
