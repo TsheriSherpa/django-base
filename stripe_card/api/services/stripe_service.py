@@ -43,10 +43,10 @@ class StripeService(ApiService):
             reference_id=reference_id,
             transaction_date=datetime.now(),
             credential_type=credential_type.upper(),
-            transaction_status=TransactionStatus.INITIATED,
             customer_name=dict_get_value("name", meta_data),
             customer_phone=dict_get_value("phone", meta_data),
             customer_email=dict_get_value("email", meta_data),
+            transaction_status=TransactionStatus.INITIATED.value,
             is_test=True if environment.upper() == "TEST" else False
         )
 
@@ -66,9 +66,7 @@ class StripeService(ApiService):
         """
         stripe.api_key = credential.secret_key
         if not customer:
-            print('**********************************')
             customer = self.create_stripe_customer(stripe, email, name, token)
-            print(customer)
 
         try:
             return stripe.Charge.create(
@@ -116,11 +114,11 @@ class StripeService(ApiService):
         """
         if not charge:
             log.message = error
-            log.transaction_status = TransactionStatus.FAILED
+            log.transaction_status = TransactionStatus.FAILED.value
 
         else:
             log.message = charge.status
             log.status_code = "00" if charge.status == "succeeded" else "01"
-            log.transaction_status = TransactionStatus.SUCCESS if charge.status == "succeeded" else TransactionStatus.ERROR
+            log.transaction_status = TransactionStatus.SUCCESS.value if charge.status == "succeeded" else TransactionStatus.ERROR.value
 
         log.save()

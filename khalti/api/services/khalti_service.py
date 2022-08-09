@@ -65,14 +65,14 @@ class KhaltiService(ApiService):
             reference_id=reference_id,
             transaction_date=datetime.now(),
             credential_type=credential_type,
-            transaction_status=TransactionStatus.INITIATED,
             is_test=True if environment == "test" else False,
             customer_name=dict_get_value("name", request_data),
+            transaction_status=TransactionStatus.INITIATED.value,
             customer_phone=dict_get_value("phone", request_data),
             customer_email=dict_get_value("email", request_data),
         )
 
-    @classmethod
+    @ classmethod
     def update_transaction_log(cls, log: KhaltiTransaction, response, error=""):
         """Update Khalti Transaction Log
 
@@ -91,10 +91,10 @@ class KhaltiService(ApiService):
         if success:
             log.message = response.state.name
             log.transaction_id = response.idx
-            log.transaction_status = TransactionStatus.COMPLETED
+            log.transaction_status = TransactionStatus.COMPLETED.value
         else:
             log.message = error
-            log.transaction_status = TransactionStatus.FAILED
+            log.transaction_status = TransactionStatus.FAILED.value
 
         log.status_code = "00" if success else "01"
         log.customer_name = response.user.name if success else None
