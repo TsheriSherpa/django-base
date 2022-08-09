@@ -5,7 +5,7 @@ from rest_framework.throttling import UserRateThrottle
 from app.api.permissions.authenticated_app import IsAuthenticatedApp
 from khalti.api.serializers.credential_serializer import CredentialSerializer
 from khalti.models import KhaltiCredential
-from stripe.models import StripeCredential
+from stripe_card.models import StripeCredential
 
 
 class AppCredentialView(generics.GenericAPIView):

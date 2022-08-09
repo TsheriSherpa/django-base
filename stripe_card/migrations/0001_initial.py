@@ -2,7 +2,7 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import stripe.models
+import stripe_card.models
 
 
 class Migration(migrations.Migration):
@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('app', models.ForeignKey(
                     on_delete=django.db.models.deletion.RESTRICT, to='app.app')),
             ],
-            bases=(models.Model, stripe.models.Transaction),
+            bases=(models.Model, stripe_card.models.Transaction),
         ),
         migrations.CreateModel(
             name='StripeCredential',

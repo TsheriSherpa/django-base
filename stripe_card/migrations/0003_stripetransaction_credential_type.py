@@ -6,13 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('stripe', '0002_stripecredential_credential_type_and_more'),
+        ('stripe_card', '0002_stripecredential_credential_type_and_more'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='stripetransaction',
             name='credential_type',
-            field=models.CharField(choices=[('TEST', 'TEST'), ('LIVE', 'LIVE')], max_length=255, null=True),
+            field=models.CharField(
+                choices=[('TEST', 'TEST'), ('LIVE', 'LIVE')], max_length=255, null=True),
         ),
     ]

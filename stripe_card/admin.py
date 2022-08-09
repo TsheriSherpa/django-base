@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from stripe.models import StripeTransaction
-from stripe.models import StripeCredential
+from stripe_card.models import StripeTransaction
+from stripe_card.models import StripeCredential
 
 
 class StripeTransactionAdmin(admin.ModelAdmin):

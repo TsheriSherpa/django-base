@@ -54,5 +54,6 @@ urlpatterns = [
 
     # Api Version 1 (v1)
     path('api/v1/app/', include('app.api.urls')),
-    path('api/v1/khalti/', include('khalti.api.urls'))
+    path('api/v1/khalti/', include('khalti.api.urls')),
+    path('api/v1/stripe/', include('stripe_card.api.urls')),
 ]

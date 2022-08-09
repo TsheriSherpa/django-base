@@ -31,8 +31,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'app',
-    'stripe',
     'khalti',
+    'stripe_card'
 ]
 
 MIDDLEWARE = [

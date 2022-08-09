@@ -1,7 +1,7 @@
 from enum import Enum
 from django.db import models
 from app.models import App
-from stripe.api.serializers.credential_serializer import CredentialSerializer
+from stripe_card.api.serializers.credential_serializer import CredentialSerializer
 
 
 class TransactionStatus(Enum):
@@ -9,14 +9,13 @@ class TransactionStatus(Enum):
     PENDING = "PENDING"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
-    ERROR = "ERROR"
 
     @classmethod
     def choices(cls) -> tuple:
         return tuple((i.name, i.value) for i in cls)
 
 
-class CredentialType(Enum):
+class Environmnet(Enum):
     TEST = "TEST"
     LIVE = "LIVE"
 
@@ -33,19 +32,23 @@ class Transaction():
 class StripeTransaction(models.Model, Transaction):
     app = models.ForeignKey(App, on_delete=models.RESTRICT)
     reference_id = models.CharField(max_length=255, unique=True)
-    transaction_id = models.CharField(max_length=255, unique=True)
+    transaction_id = models.CharField(max_length=255, unique=True, null=True)
     amount = models.DecimalField(decimal_places=2, max_digits=10)
+    currency = models.CharField(max_length=255, null=-True)
     transaction_status = models.CharField(
         max_length=255, choices=TransactionStatus.choices())
     status_code = models.CharField(max_length=10)
     remarks = models.CharField(max_length=255)
+    message = models.CharField(max_length=255, null=True)
     transaction_date = models.DateTimeField(auto_now_add=True)
+    customer = models.CharField(max_length=255, null=True)
     customer_email = models.CharField(max_length=255, null=True)
     customer_name = models.CharField(max_length=255, null=True)
+    customer_phone = models.CharField(max_length=255, null=True)
     request_ip = models.CharField(max_length=255, null=True)
     user_agent = models.CharField(max_length=255, null=True)
     credential_type = models.CharField(
-        max_length=255, null=True, choices=CredentialType.choices())
+        max_length=255, null=True)
     is_test = models.BooleanField(
         default=False, verbose_name="Is test payment?")
     meta_data = models.JSONField()
@@ -61,7 +64,7 @@ class StripeCredential(models.Model):
     credential_type = models.CharField(
         max_length=255, verbose_name="Credential Used For", null=True)
     environment = models.CharField(
-        max_length=255, verbose_name="Is test or live?", null=True)
+        max_length=255, null=True, choices=Environmnet.choices())
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -4,8 +4,9 @@
 import requests
 from datetime import datetime
 from khalti.models import KhaltiCredential, KhaltiTransaction
-from stripe.models import TransactionStatus
+from stripe_card.models import TransactionStatus
 from utils.api_service import ApiService
+from utils.helpers import dict_get_value
 
 
 class KhaltiService(ApiService):
@@ -15,8 +16,7 @@ class KhaltiService(ApiService):
         Extends (ApiService)
     """
 
-    @classmethod
-    def verify_transaction(cls, credential: KhaltiCredential, reference_id: str):
+    def verify_transaction(self, credential: KhaltiCredential, reference_id: str):
         """ Verify Khalti Transaction
 
         Args:
@@ -37,13 +37,19 @@ class KhaltiService(ApiService):
         return requests.post(url, payload, headers=headers)
 
     @classmethod
-    def create_transaction_log(cls, app, credential_type, environment, amount, reference_id, request_ip, user_agent, remarks):
+    def create_transaction_log(cls, app, credential_type, environment, amount, reference_id, request_ip, user_agent, remarks, request_data):
         """Create Khalti Transaction Log
 
         Args:
-            app (App): App Object
-            enviornment (str): test or live?
-            data (dict): request's data
+            app (App):App Object
+            credential_type (str): which credentail to choose from if  multiple available
+            environment (str): payment live or test?
+            amount (float): transaction amount
+            reference_id (str): unique refernce_id of transaction
+            request_ip (str): ip of request creator
+            user_agent (str): user agent of request creator
+            remarks (str): remarks for the transaction
+
         """
         return KhaltiTransaction.objects.create(
             app=app,
@@ -57,11 +63,14 @@ class KhaltiService(ApiService):
             transaction_date=datetime.now(),
             credential_type=credential_type,
             transaction_status=TransactionStatus.INITIATED,
-            is_test=True if environment == "test" else False
+            is_test=True if environment == "test" else False,
+            customer_name=dict_get_value("name", request_data),
+            customer_phone=dict_get_value("phone", request_data),
+            customer_email=dict_get_value("email", request_data),
         )
 
     @classmethod
-    def update_transaction_log(cls, log: KhaltiTransaction, response):
+    def update_transaction_log(cls, log: KhaltiTransaction, response, error=""):
         """Update Khalti Transaction Log
 
         Args:
@@ -72,11 +81,17 @@ class KhaltiService(ApiService):
             void: return nothing
         """
         success = True if response.status_code == 200 else False
-        if success:
-            log.transaction_id = response.idx
 
-        log.status_code = "00" if success else "01",
-        log.customer_name = response.user.name if success else None,
-        log.customer_phone = response.user.mobile if success else None,
+        if success:
+            log.message = response.state.name
+            log.transaction_status = TransactionStatus.COMPLETED
+            log.transaction_id = response.idx
+        else:
+            log.message = error
+            log.transaction_status = TransactionStatus.FAILED
+
+        log.status_code = "00" if success else "01"
+        log.customer_name = response.user.name if success else None
+        log.customer_phone = response.user.mobile if success else None
         log.meta_data = response.json()
         log.save()

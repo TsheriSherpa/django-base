@@ -6,18 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('stripe', '0001_initial'),
+        ('stripe_card', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='stripecredential',
             name='credential_type',
-            field=models.CharField(max_length=255, null=True, verbose_name='Credential Used For'),
+            field=models.CharField(
+                max_length=255, null=True, verbose_name='Credential Used For'),
         ),
         migrations.AddField(
             model_name='stripecredential',
             name='environment',
-            field=models.CharField(max_length=255, null=True, verbose_name='Is test or live?'),
+            field=models.CharField(
+                max_length=255, null=True, verbose_name='Is test or live?'),
         ),
     ]
