@@ -26,15 +26,18 @@ class KhaltiService(ApiService):
         Returns:
             KhaltiTransaction: Khalti transaction log
         """
-        url = credential.base_url + "api/v2/payment/verify/"
-        payload = {
-            "token": reference_id,
-            "amount": 1000
-        }
-        headers = {
-            "Authorization": "Key " + credential.secret_key
-        }
-        return requests.post(url, payload, headers=headers)
+        try:
+            url = credential.base_url + "api/v2/payment/verify/"
+            payload = {
+                "token": reference_id,
+                "amount": 1000
+            }
+            headers = {
+                "Authorization": "Key " + credential.secret_key
+            }
+            return requests.post(url, payload, headers=headers)
+        except Exception as e:
+            return self.setError(e, 422)
 
     @classmethod
     def create_transaction_log(cls, app, credential_type, environment, amount, reference_id, request_ip, user_agent, remarks, request_data):
@@ -80,12 +83,15 @@ class KhaltiService(ApiService):
         Returns:
             void: return nothing
         """
-        success = True if response.status_code == 200 else False
+        if response:
+            success = True if response.status_code == 200 else False
+        else:
+            success = False
 
         if success:
             log.message = response.state.name
-            log.transaction_status = TransactionStatus.COMPLETED
             log.transaction_id = response.idx
+            log.transaction_status = TransactionStatus.COMPLETED
         else:
             log.message = error
             log.transaction_status = TransactionStatus.FAILED
