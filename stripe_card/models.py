@@ -15,7 +15,7 @@ class TransactionStatus(Enum):
         return tuple((i.name, i.value) for i in cls)
 
 
-class Environmnet(Enum):
+class Environment(Enum):
     TEST = "TEST"
     LIVE = "LIVE"
 
@@ -64,7 +64,7 @@ class StripeCredential(models.Model):
     credential_type = models.CharField(
         max_length=255, verbose_name="Credential Used For", null=True)
     environment = models.CharField(
-        max_length=255, null=True, choices=Environmnet.choices())
+        max_length=255, null=True, choices=Environment.choices())
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
