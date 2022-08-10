@@ -51,7 +51,7 @@ class KhaltiVerifyView(generics.GenericAPIView):
         )
 
         credential = AppService.get_credential(
-            request.app, 'khalti', request.GET.get('credential_type'), request.GET.get('environment').upper())
+            request.app, 'khalti', request.GET.get('credential_type'), request.GET.get('environment'))
 
         response = self.service.verify_transaction(
             credential, request.GET['reference_id'])
