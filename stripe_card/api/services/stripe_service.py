@@ -49,7 +49,7 @@ class StripeService(ApiService):
             is_test=True if environment.upper() == "TEST" else False
         )
 
-    def create_charge(self, amount, currency, customer, email, name, token, credential):
+    def create_charge(self, amount, currency, customer, email, name, token, credential, description):
         """Create Stripe Charge
 
         Args:
@@ -65,7 +65,7 @@ class StripeService(ApiService):
         """
         stripe.api_key = credential.secret_key
         if not customer:
-            customer = self.create_stripe_customer(stripe, email, name, token)
+            customer = self.create_stripe_customer(stripe, email, name, token, description)
 
         try:
             return stripe.Charge.create(
@@ -81,7 +81,7 @@ class StripeService(ApiService):
         except Exception as e:
             return self.setError("Something went wrong", 500)
 
-    def create_stripe_customer(self, stripe, email, name, token):
+    def create_stripe_customer(self, stripe, email, name, token, description):
         """Create Stripe Customer
 
         Args:
@@ -95,7 +95,7 @@ class StripeService(ApiService):
                 name=name,
                 email=email,
                 source=token,
-                description=email + " " + name,
+                description=description,
             )
         except stripe.error.CardError as e:
             return self.setError("A payment error occurred: {}".format(e.user_message), 422)

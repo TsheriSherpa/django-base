@@ -62,7 +62,8 @@ class PaymentView(generics.GenericAPIView):
             request.GET['email'],
             request.GET['name'],
             request.GET['reference_id'],
-            credential)
+            credential,
+            request.GET['description'])
 
         self.service.update_transaction_log(
             log, charge, self.service.getErrorMessage())

@@ -45,13 +45,6 @@ class CreatePaymentIntentView(generics.GenericAPIView):
             request.GET['amount'],
             request.GET['currency'],
             request.GET['email'])
-        print(intent)
-
-        if not intent:
-            return Response({
-                'status': False,
-                'message': self.service.getErrorMessage()
-            }, self.service.getErrorCode())
 
         log = self.service.create_transaction_log(
             request.app,
@@ -69,7 +62,12 @@ class CreatePaymentIntentView(generics.GenericAPIView):
             intent
         )
 
-        log.payment_intent = intent
+        if not intent:
+            return Response({
+                'status': False,
+                'message': self.service.getErrorMessage()
+            }, self.service.getErrorCode())
+
         return Response({
             'status': True,
             'data': intent.id
