@@ -33,11 +33,12 @@ class StripeTransaction(models.Model, Transaction):
     app = models.ForeignKey(App, on_delete=models.RESTRICT)
     reference_id = models.CharField(max_length=255, unique=True)
     transaction_id = models.CharField(max_length=255, unique=True, null=True)
+    payment_intent = models.JSONField(null=True)
+    charge_object = models.JSONField(null=True)
     amount = models.DecimalField(decimal_places=2, max_digits=10)
     currency = models.CharField(max_length=255, null=-True)
     transaction_status = models.CharField(
         max_length=255, choices=TransactionStatus.choices())
-    status_code = models.CharField(max_length=10)
     remarks = models.CharField(max_length=255)
     message = models.CharField(max_length=255, null=True)
     transaction_date = models.DateTimeField(auto_now_add=True)

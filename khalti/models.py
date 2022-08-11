@@ -12,7 +12,6 @@ class KhaltiTransaction(models.Model, Transaction):
     amount = models.DecimalField(decimal_places=2, max_digits=10)
     transaction_status = models.CharField(
         max_length=255, choices=TransactionStatus.choices())
-    status_code = models.CharField(max_length=10)
     remarks = models.CharField(max_length=255)
     message = models.CharField(max_length=255, null=True)
     transaction_date = models.DateTimeField(auto_now_add=True)

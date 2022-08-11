@@ -1,8 +1,7 @@
 from datetime import datetime
-from sre_constants import SUCCESS
 import stripe
 from utils.api_service import ApiService
-from stripe_card.models import StripeTransaction, TransactionStatus
+from stripe_card.models import StripeCredential, StripeTransaction, TransactionStatus
 from utils.helpers import dict_get_value
 
 
@@ -14,7 +13,7 @@ class StripeService(ApiService):
     """
 
     @classmethod
-    def create_transaction_log(cls, app, credential_type, environment, amount, charge_currency, customer, reference_id, request_ip, user_agent, remarks, meta_data):
+    def create_transaction_log(cls, app, credential_type, environment, amount, charge_currency, customer, reference_id, request_ip, user_agent, remarks, meta_data, payment_intent=None):
         """Create Khalti Transaction Log
 
         Args:
@@ -34,13 +33,13 @@ class StripeService(ApiService):
             app=app,
             amount=amount,
             remarks=remarks,
-            status_code="01",
             customer=customer,
             meta_data=meta_data,
             user_agent=user_agent,
             request_ip=request_ip,
             currency=charge_currency,
             reference_id=reference_id,
+            payment_intent=payment_intent,
             transaction_date=datetime.now(),
             credential_type=credential_type.upper(),
             customer_name=dict_get_value("name", meta_data),
@@ -72,7 +71,8 @@ class StripeService(ApiService):
             return stripe.Charge.create(
                 amount=amount,
                 currency=currency,
-                customer=customer)
+                customer=customer,
+                receipt_email=email)
 
         except stripe.error.CardError as e:
             return self.setError("A payment error occurred: {}".format(e.user_message), 422)
@@ -117,8 +117,40 @@ class StripeService(ApiService):
             log.transaction_status = TransactionStatus.FAILED.value
 
         else:
+            log.charge_object = charge
             log.message = charge.status
-            log.status_code = "00" if charge.status == "succeeded" else "01"
             log.transaction_status = TransactionStatus.SUCCESS.value if charge.status == "succeeded" else TransactionStatus.ERROR.value
 
         log.save()
+
+    def create_payment_intent(self, credential, amount, currency, email):
+        """Create Stripe Payment Intent
+
+        Args:
+            credential (str): StripeCredential
+            amount (int): total amount to be paid
+            currency (str): currency used for payment
+            email (str): email of the customer 
+        """
+        try:
+            stripe.api_key = credential.secret_key
+            return stripe.PaymentIntent.create(
+                amount=amount,
+                currency=currency,
+                receipt_email=email,
+                payment_method_types=["card", "alipay", "wechat_pay"],
+            )
+        except Exception as e:
+            return self.setError(e, 422)
+
+    def capture_payment_intent(self, credential: StripeCredential, payment_intent: str):
+        """Capture payment intent
+
+        Args:
+            payment_intent (str): Stripe Payment Intent ID
+        """
+        try:
+            stripe.api_key = credential.secret_key
+            return stripe.PaymentIntent.capture(payment_intent)
+        except Exception as e:
+            return self.setError(e, 422)

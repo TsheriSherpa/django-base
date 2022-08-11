@@ -56,7 +56,6 @@ class KhaltiService(ApiService):
             amount=amount,
             meta_data={},
             remarks=remarks,
-            status_code="01",
             user_agent=user_agent,
             request_ip=request_ip,
             reference_id=reference_id,
@@ -93,7 +92,6 @@ class KhaltiService(ApiService):
             log.message = error
             log.transaction_status = TransactionStatus.FAILED.value
 
-        log.status_code = "00" if success else "01"
         log.customer_name = response.user.name if success else None
         log.customer_phone = response.user.mobile if success else None
         log.meta_data = response.json()
