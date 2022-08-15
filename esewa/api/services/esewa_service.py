@@ -45,7 +45,7 @@ class EsewaService(ApiService):
         return EsewaTransaction.objects.create(
             app=app,
             amount=amount,
-            meta_data={},
+            meta_data=request_data,
             remarks=remarks,
             status_code="01",
             user_agent=user_agent,
@@ -54,6 +54,7 @@ class EsewaService(ApiService):
             transaction_date=datetime.now(),
             credential_type=credential_type,
             transaction_status=TransactionStatus.INITIATED.value,
+            transaction_id=reference_id,
             is_test=True if environment == "test" else False,
             customer_name=dict_get_value("name", request_data),
             customer_phone=dict_get_value("phone", request_data),
@@ -83,5 +84,59 @@ class EsewaService(ApiService):
 
         log.status_code = "00" if success else "01"
         log.save()
+
+    
+    @classmethod
+    def verify_transaction(cls,credential:EsewaCredential,reference_id):
+        """ Verify Esewa Transaction
+
+        Args:
+            credential (EsewaCredential): App Esewa's Credential
+            reference_id (str): Unique id of transaction
+
+        Returns:
+            EsewaTransaction: Esewa transaction log
+        """
+        url=credential.base_url+"mobile/transaction?txnRefId="+reference_id
+
+        header={
+            "merchantId":credential.public_key,
+            "merchantSecret":credential.secret_key
+        }
+        return requests.get(url,headers=header)
+
+
+    # @classmethod
+    # def mobile_update_transaction_log(cls,log:EsewaCredential,response,error=""):
+    #     """Update Khalti Transaction Log
+
+    #     Args:
+    #         log (KhaltiTransaction): log object
+    #         response (Object): requests.Response object
+
+    #     Returns:
+    #         void: return nothing
+    #     """
+    #     success = True if response.status_code == 200 else False
+
+    #     if success:
+    #         log.app=response.app
+    #         log.message = response.state.name
+    #         log.transaction_status = TransactionStatus.COMPLETED
+    #         log.transaction_id = response.idx
+    #     else:
+    #         log.message = error
+    #         log.transaction_status = TransactionStatus.FAILED
+
+    #     log.status_code = "00" if success else "01"
+    #     log.customer_name = response.user.name if success else None
+    #     log.customer_phone = response.user.mobile if success else None
+    #     log.meta_data = response.json()
+    #     log.save()
+
+    
+        
+
+
 
 

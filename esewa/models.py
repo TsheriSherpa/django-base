@@ -9,8 +9,8 @@ from esewa.api.serializers.credentialserializers import CredentialSerializer
 
 
 class EsewaTransaction(models.Model,Transaction):
-    app = models.ForeignKey(App, on_delete=models.RESTRICT)
-    reference_id = models.CharField(max_length=255, unique=True)
+    app = models.ForeignKey(App, on_delete=models.RESTRICT,null=True)
+    reference_id = models.CharField(max_length=255, unique=True) #esewa reference id when the success
     transaction_id = models.CharField(max_length=255, unique=True, null=True)
     amount = models.DecimalField(decimal_places=2, max_digits=10)
     transaction_status = models.CharField(
@@ -29,7 +29,6 @@ class EsewaTransaction(models.Model,Transaction):
     customer_name = models.CharField(max_length=255, null=True)
     customer_phone = models.CharField(max_length=15, null=True)
     meta_data = models.JSONField()
-    oid=models.CharField(max_length=30,null=True) #esewa reference id when the success
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
