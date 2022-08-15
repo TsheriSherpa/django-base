@@ -65,7 +65,8 @@ class StripeService(ApiService):
         """
         stripe.api_key = credential.secret_key
         if not customer:
-            customer = self.create_stripe_customer(stripe, email, name, token, description)
+            customer = self.create_stripe_customer(
+                stripe, email, name, token, description)
 
         try:
             return stripe.Charge.create(
@@ -130,7 +131,7 @@ class StripeService(ApiService):
             credential (str): StripeCredential
             amount (int): total amount to be paid
             currency (str): currency used for payment
-            email (str): email of the customer 
+            email (str): email of the customer
         """
         try:
             stripe.api_key = credential.secret_key
@@ -140,8 +141,16 @@ class StripeService(ApiService):
                 receipt_email=email,
                 payment_method_types=["card", "alipay", "wechat_pay"],
             )
-        except Exception as e:
-            return self.setError(e, 422)
+        except stripe.error.InvalidRequestError:
+            return self.setError("Invalid parameters provided")
+        except stripe.error.AuthenticationError:
+            return self.setError("Authentication with stripe failed")
+        except stripe.error.APIConnectionError:
+            return self.setError("Network communication with Stripe failed")
+        except stripe.error.StripeError:
+            return self.setError("Error in stripe")
+        except Exception:
+            return self.setError("Something went wrong", 422)
 
     def capture_payment_intent(self, credential: StripeCredential, payment_intent: str):
         """Capture payment intent
@@ -152,5 +161,13 @@ class StripeService(ApiService):
         try:
             stripe.api_key = credential.secret_key
             return stripe.PaymentIntent.capture(payment_intent)
-        except Exception as e:
-            return self.setError(e, 422)
+        except stripe.error.InvalidRequestError:
+            return self.setError("Invalid intent provided")
+        except stripe.error.AuthenticationError:
+            return self.setError("Authentication with stripe failed")
+        except stripe.error.APIConnectionError:
+            return self.setError("Network communication with Stripe failed")
+        except stripe.error.StripeError:
+            return self.setError("Error in stripe")
+        except Exception:
+            return self.setError("Something went wrong", 422)
