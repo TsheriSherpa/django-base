@@ -1,4 +1,5 @@
-from app.api.services.app_services import AppService
+from app.api.services.app_service import AppService
+from app.api.permissions.authenticated_app import IsAuthenticatedApp
 from khalti.api.serializers.verify_serializers import VerifySerializer
 from khalti.api.services.khalti_service import KhaltiService
 
@@ -6,7 +7,6 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
-from app.api.permissions.authenticated_app import IsAuthenticatedApp
 from utils.helpers import get_client_ip
 
 
