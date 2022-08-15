@@ -29,6 +29,7 @@ class EsewaTransaction(models.Model,Transaction):
     customer_name = models.CharField(max_length=255, null=True)
     customer_phone = models.CharField(max_length=15, null=True)
     meta_data = models.JSONField()
+    oid=models.CharField(max_length=30,null=True) #esewa reference id when the success
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -42,8 +43,6 @@ class EsewaCredential(models.Model):
         max_length=255, verbose_name="Credential Used For", null=True)
     environment = models.CharField(
         max_length=255, verbose_name="Is test or live?", null=True, choices=Environmnet.choices())
-    success_url=models.CharField(max_length=500,null=True)
-    failure_url=models.CharField(max_length=500,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -135,3 +135,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 }
+
+BASE_URL = os.getenv("BASE_URL")

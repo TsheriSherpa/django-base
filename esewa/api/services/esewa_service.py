@@ -1,10 +1,12 @@
 import requests
+from core import settings
 from esewa.models import EsewaCredential, EsewaTransaction
 from utils.api_service import ApiService
 from stripe_card.models import TransactionStatus
 from datetime import datetime
 from utils.helpers import dict_get_value
 from django.shortcuts import get_object_or_404, redirect, render
+
 
 class EsewaService(ApiService):
     """
@@ -13,8 +15,8 @@ class EsewaService(ApiService):
     Extends (ApiService)
     """
 
-    def payment_transaction(self,request, credential: EsewaCredential, data):
-        """ Verify Khalti Transaction
+    def payment_transaction(self, request, credential: EsewaCredential, data):
+        """ Verify Esewa Transaction
 
         Args:
             credential (EsewaCredential): App esewa's Credential
@@ -23,9 +25,7 @@ class EsewaService(ApiService):
         Returns:
             EsewaCredential: Esewa transaction log
         """
-        # print("credential-----------------------",credential)
         url = credential.base_url+"epay/main/"
-        # print(url)
         payload = {
             'amt': data['amount'],
             'pdc': 0,
@@ -34,14 +34,11 @@ class EsewaService(ApiService):
             'tAmt': 100,
             'pid': data['reference_id'],
             'scd': credential.secret_key,
-            'su': credential.success_url,
-            'fu': credential.failure_url,
-            'url':url
+            'su': settings.BASE_URL + "api/v1/esewa/web/callback/success",
+            'fu': settings.BASE_URL + "api/v1/esewa/web/callback/failure"+"?oid="+data['reference_id'],
+            'url': url
         }
-        print("=============",payload)
-        return render(request,'esewa/index.html',payload) 
-
-        # return requests.post(url,payload)
+        return render(request, 'esewa/index.html', payload)
 
     @classmethod
     def create_transaction_log(cls, app, credential_type, environment, amount, reference_id, request_ip, user_agent, remarks, request_data):
@@ -56,10 +53,35 @@ class EsewaService(ApiService):
             reference_id=reference_id,
             transaction_date=datetime.now(),
             credential_type=credential_type,
-            transaction_status=TransactionStatus.INITIATED,
+            transaction_status=TransactionStatus.INITIATED.value,
             is_test=True if environment == "test" else False,
             customer_name=dict_get_value("name", request_data),
             customer_phone=dict_get_value("phone", request_data),
             customer_email=dict_get_value("email", request_data),
         )
+
+    @classmethod
+    def update_transaction_log(cls, log: EsewaCredential, response, refId, error=""):
+        """Update Esewa Transaction Log
+
+        Args:
+            log (EsewaTransaction): log object
+            response (Object): requests.Response object
+
+        Returns:
+            void: return nothing
+        """
+        success = True if response == "success" else False
+
+        if success:
+            log.message = "Success"
+            log.transaction_status = TransactionStatus.COMPLETED.value
+            log.transaction_id = refId
+        else:
+            log.message = "Failure"
+            log.transaction_status = TransactionStatus.FAILED.value
+
+        log.status_code = "00" if success else "01"
+        log.save()
+
 

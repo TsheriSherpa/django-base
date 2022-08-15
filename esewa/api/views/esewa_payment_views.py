@@ -43,7 +43,7 @@ class EsewaPaymentView(generics.GenericAPIView):
             request.GET['environment'],
             request.GET['amount'],
             request.GET['reference_id'],
-            "get_client_ip(request)",
+            get_client_ip(request),
             request.META['HTTP_USER_AGENT'],
             request.GET['remarks'],
             request.GET
@@ -51,8 +51,3 @@ class EsewaPaymentView(generics.GenericAPIView):
 
         credential=AppService.get_credential(request.app,'esewa',request.GET['credential_type'],request.GET['environment'])
         return self.service.payment_transaction(request,credential,request.GET)
-
-        # return Response({
-        #     'status':True if response.status_code == 200 else False,
-        #     'data':response
-        # },response.status_code)
