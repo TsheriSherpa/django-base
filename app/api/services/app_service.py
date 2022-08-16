@@ -1,6 +1,7 @@
 
 from re import L
 from sys import api_version
+from esewa.models import EsewaCredential
 
 from khalti.models import KhaltiCredential
 from stripe_card.models import StripeCredential
@@ -21,5 +22,8 @@ class AppService:
                 credential_type=credential_type.upper(),
                 environment=environment.upper()
             ).first()
+
+        if gateway == 'esewa':
+            return EsewaCredential.objects.filter(app=app, credential_type=credential_type.upper(), environment=environment.upper()).first()
 
         raise Exception("Unknown Payment Gateway")
