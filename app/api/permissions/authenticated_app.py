@@ -20,6 +20,5 @@ class IsAuthenticatedApp(authentication.BaseAuthentication):
     def authenticate(self, request):
         auth = Auth(request, App)
         auth.authenticate()
-        print(auth.app())
         request.app = auth.app()
         return (auth.app(), None)

@@ -1,7 +1,3 @@
-
-from re import L
-from sys import api_version
-
 from khalti.models import KhaltiCredential
 from stripe_card.models import StripeCredential
 

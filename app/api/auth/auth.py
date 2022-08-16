@@ -1,6 +1,5 @@
 import json
 from datetime import datetime, timedelta
-from os import access
 
 from rest_framework import exceptions
 
