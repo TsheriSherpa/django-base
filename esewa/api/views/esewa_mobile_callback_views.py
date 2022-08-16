@@ -1,5 +1,4 @@
 from fcntl import F_ADD_SEALS
-from app.api.services.app_services import AppService
 from esewa.api.services.esewa_service import EsewaService
 from ...models import EsewaTransaction
 from rest_framework import generics

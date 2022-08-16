@@ -2,7 +2,7 @@ from django.db import models
 
 from stripe_card.models import Transaction,TransactionStatus
 from app.models import App
-from stripe_card.models import Environmnet
+from stripe_card.models import Environment
 from esewa.api.serializers.credentialserializers import CredentialSerializer
 
 # Create your models here.
@@ -41,7 +41,7 @@ class EsewaCredential(models.Model):
     credential_type = models.CharField(
         max_length=255, verbose_name="Credential Used For", null=True)
     environment = models.CharField(
-        max_length=255, verbose_name="Is test or live?", null=True, choices=Environmnet.choices())
+        max_length=255, verbose_name="Is test or live?", null=True, choices=Environment.choices())
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
