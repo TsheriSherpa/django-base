@@ -18,7 +18,10 @@ class AppService:
 
         if gateway == 'stripe':
             return StripeCredential.objects.filter(
-                app=app, credential_type=credential_type.upper(), environment=environment.upper()).first()
+                app=app,
+                credential_type=credential_type.upper(),
+                environment=environment.upper()
+            ).first()
 
         if gateway == 'esewa':
             return EsewaCredential.objects.filter(app=app, credential_type=credential_type.upper(), environment=environment.upper()).first()

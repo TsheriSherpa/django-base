@@ -15,7 +15,7 @@ class TransactionStatus(Enum):
         return tuple((i.name, i.value) for i in cls)
 
 
-class Environmnet(Enum):
+class Environment(Enum):
     TEST = "TEST"
     LIVE = "LIVE"
 
@@ -33,11 +33,12 @@ class StripeTransaction(models.Model, Transaction):
     app = models.ForeignKey(App, on_delete=models.RESTRICT)
     reference_id = models.CharField(max_length=255, unique=True)
     transaction_id = models.CharField(max_length=255, unique=True, null=True)
+    payment_intent = models.JSONField(null=True)
+    charge_object = models.JSONField(null=True)
     amount = models.DecimalField(decimal_places=2, max_digits=10)
     currency = models.CharField(max_length=255, null=-True)
     transaction_status = models.CharField(
         max_length=255, choices=TransactionStatus.choices())
-    status_code = models.CharField(max_length=10)
     remarks = models.CharField(max_length=255)
     message = models.CharField(max_length=255, null=True)
     transaction_date = models.DateTimeField(auto_now_add=True)
@@ -64,7 +65,7 @@ class StripeCredential(models.Model):
     credential_type = models.CharField(
         max_length=255, verbose_name="Credential Used For", null=True)
     environment = models.CharField(
-        max_length=255, null=True, choices=Environmnet.choices())
+        max_length=255, null=True, choices=Environment.choices())
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

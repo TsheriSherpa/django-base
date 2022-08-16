@@ -1,6 +1,6 @@
 from django.db import models
 from app.models import App
-from stripe_card.models import Environmnet, Transaction, TransactionStatus
+from stripe_card.models import Environment, Transaction, TransactionStatus
 
 from khalti.api.serializers.credential_serializer import CredentialSerializer
 
@@ -12,7 +12,6 @@ class KhaltiTransaction(models.Model, Transaction):
     amount = models.DecimalField(decimal_places=2, max_digits=10)
     transaction_status = models.CharField(
         max_length=255, choices=TransactionStatus.choices())
-    status_code = models.CharField(max_length=10)
     remarks = models.CharField(max_length=255)
     message = models.CharField(max_length=255, null=True)
     transaction_date = models.DateTimeField(auto_now_add=True)
@@ -38,7 +37,7 @@ class KhaltiCredential(models.Model):
     credential_type = models.CharField(
         max_length=255, verbose_name="Credential Used For", null=True)
     environment = models.CharField(
-        max_length=255, verbose_name="Is test or live?", null=True, choices=Environmnet.choices())
+        max_length=255, verbose_name="Is test or live?", null=True, choices=Environment.choices())
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

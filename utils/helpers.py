@@ -28,7 +28,7 @@ def dict_key_exists(key, dictionary):
     for dict_key in dictionary.keys():
         if dict_key == key:
             return True
-    return None
+    return False
 
 
 def dict_get_value(key, dictionary):

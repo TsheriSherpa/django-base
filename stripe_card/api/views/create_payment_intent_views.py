@@ -1,22 +1,22 @@
-from app.api.services.app_services import AppService
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
 from app.api.permissions.authenticated_app import IsAuthenticatedApp
+from app.api.services.app_services import AppService
 from khalti.api.serializers.verify_serializers import VerifySerializer
 from stripe_card.api.services.stripe_service import StripeService
 from utils.helpers import dict_key_exists, get_client_ip
 
 
-class PaymentView(generics.GenericAPIView):
-    """Stripe Payment Views
+class CreatePaymentIntentView(generics.GenericAPIView):
+    """Stripe Create Payment Intent Views
 
     Args:
         generics (GenericAPIView): GenericAPIView
 
     Returns:
-        Response: Stripe Charge Response
+        Response: Stripe Payment Intent Response
     """
     authentication_classes = [IsAuthenticatedApp]
     throttle_classes = [UserRateThrottle]
@@ -29,11 +29,23 @@ class PaymentView(generics.GenericAPIView):
         self.service = StripeService()
 
     def post(self, request):
-        """Make Stripe Payment
+        """Create Stripe Payment Intent
 
         Args:
             request : django request object
         """
+
+        credential = AppService.get_credential(
+            request.app, 'stripe',
+            request.GET.get('credential_type'),
+            request.GET.get('environment'))
+
+        intent = self.service.create_payment_intent(
+            credential,
+            request.GET['amount'],
+            request.GET['currency'],
+            request.GET['email'])
+
         log = self.service.create_transaction_log(
             request.app,
             request.GET['credential_type'],
@@ -46,35 +58,17 @@ class PaymentView(generics.GenericAPIView):
             get_client_ip(request),
             request.META['HTTP_USER_AGENT'],
             request.GET['remarks'],
-            request.GET
+            request.GET,
+            intent
         )
 
-        credential = AppService.get_credential(
-            request.app, 'stripe',
-            request.GET.get('credential_type'),
-            request.GET.get('environment'))
-
-        charge = self.service.create_charge(
-            request.GET['amount'],
-            request.GET['currency'],
-            request.GET['customer'] if dict_key_exists(
-                'customer', request.GET) else None,
-            request.GET['email'],
-            request.GET['name'],
-            request.GET['reference_id'],
-            credential,
-            request.GET['description'])
-
-        self.service.update_transaction_log(
-            log, charge, self.service.getErrorMessage())
-
-        if charge:
+        if not intent:
             return Response({
-                'status': True,
-                'data': charge
-            }, 200)
+                'status': False,
+                'message': self.service.getErrorMessage()
+            }, self.service.getErrorCode())
 
         return Response({
-            'status': False,
-            'message': self.service.getErrorMessage()
-        }, self.service.getErrorCode())
+            'status': True,
+            'data': intent.id
+        }, 200)
