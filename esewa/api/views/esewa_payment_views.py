@@ -1,4 +1,4 @@
-from app.api.services.app_services import AppService
+from app.api.services.app_service import AppService
 from esewa.api.services.esewa_service import EsewaService
 from rest_framework import generics
 from app.api.permissions.authenticated_app import IsAuthenticatedApp

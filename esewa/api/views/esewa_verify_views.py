@@ -1,5 +1,5 @@
 from multiprocessing.sharedctypes import Value
-from app.api.services.app_services import AppService
+from app.api.services.app_service import AppService
 from esewa.api.services.esewa_service import EsewaService
 from ...models import EsewaTransaction
 from khalti.api.serializers.verify_serializers import VerifySerializer
