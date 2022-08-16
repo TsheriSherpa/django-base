@@ -1,7 +1,6 @@
-from django.contrib.auth import authenticate
+from app.api.auth.auth import Auth
 from app.models import App
 
-from rest_framework import exceptions
 from rest_framework import authentication
 
 
@@ -19,25 +18,8 @@ class IsAuthenticatedApp(authentication.BaseAuthentication):
     """
 
     def authenticate(self, request):
-        auth = self.get_authorization_header(request)
-        username = auth.get("username")
-        password = auth.get("password")
-
-        app = App.objects.filter(username=username, password=password).first()
-        # app=App.objects.filter(username="radio").first() #for testing only
-        if not app:
-            raise exceptions.AuthenticationFailed(('Authentication Failure'))
-
-        request.app = app
-        return (app, None)
-
-    @staticmethod
-    def get_authorization_header(request):
-        """
-        Return request's 'Authorization:' header, as a bytestring.
-        """
-
-        username = request.headers.get("username")
-        password = request.headers.get("password")
-
-        return {'username': username, 'password': password}
+        auth = Auth(request, App)
+        auth.authenticate()
+        print(auth.app())
+        request.app = auth.app()
+        return (auth.app(), None)
