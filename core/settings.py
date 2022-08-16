@@ -134,3 +134,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 }
+
+APP_API_SECRET = os.getenv(
+    'APP_API_SECRET', 'S-6BYO_iYihXwB89gdLwCl2WWCRrA5ITSFNrexAV-hA=')
