@@ -32,7 +32,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'app',
     'khalti',
-    'stripe_card'
+    'stripe_card',
+    'esewa'
 ]
 
 MIDDLEWARE = [
@@ -135,5 +136,6 @@ REST_FRAMEWORK = {
     ],
 }
 
+BASE_URL = os.getenv("BASE_URL")
 APP_API_SECRET = os.getenv(
     'APP_API_SECRET', 'S-6BYO_iYihXwB89gdLwCl2WWCRrA5ITSFNrexAV-hA=')
