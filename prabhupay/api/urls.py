@@ -1,4 +1,5 @@
 from django.urls import path
+from app.api.views.access_token_views import AccessTokenView
 from app.api.views.app_authenticate_views import AppAuthenticateView
 from app.api.views.app_credential_views import AppCredentialView
 
