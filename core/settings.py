@@ -136,8 +136,34 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
 }
 
+# Application Base Url
 BASE_URL = os.getenv("BASE_URL")
+
+# API secret key for app api authentication
 APP_API_SECRET = os.getenv(
     'APP_API_SECRET', 'S-6BYO_iYihXwB89gdLwCl2WWCRrA5ITSFNrexAV-hA=')
+
+# Swagger
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'App Auth': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Auth-Token'
+        },
+        'Dashboard Auth': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Auth-Token'
+        },
+        'Admin Auth': {
+            'type': 'basic',
+            'in': 'header'
+        }
+    },
+}
