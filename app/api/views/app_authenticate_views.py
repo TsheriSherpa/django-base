@@ -1,10 +1,12 @@
 from rest_framework import generics
-from rest_framework.response import Response
+
 from rest_framework.throttling import UserRateThrottle
 from app.api.auth.auth import Auth
 
-from app.api.serializers.app_access_token_serializer import AppAccessTokenSerializer
+from app.api.serializers.app_authenticate_serializer import AppAuthenticateSerializer
 from app.models import App
+from utils.api_response import ApiResponse
+from utils.helpers import get_error_message
 
 
 class AppAuthenticateView(generics.GenericAPIView):
@@ -17,7 +19,7 @@ class AppAuthenticateView(generics.GenericAPIView):
         Response: App payment gateway's credentials
     """
     throttle_classes = [UserRateThrottle]
-    serializer_class = AppAccessTokenSerializer
+    serializer_class = AppAuthenticateSerializer
 
     def post(self, request):
         """Get Access Token For App Using Username And Password
@@ -28,22 +30,15 @@ class AppAuthenticateView(generics.GenericAPIView):
         Returns:
             list: list of serialized payment credentials
         """
-        app = App.objects.filter(username=request.data['username']).first()
-        if not app:
-            return Response({
-                'status': False,
-                'error': 'Username or Password Incorrect'
-            }, 401)
-        auth = Auth(request, App)
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return ApiResponse.send_error(get_error_message(serializer), 400)
 
-        if not auth.match_password(request.data['password'], app.password):
-            return Response({
-                'status': False,
-                'error': 'Username or Password Incorrect'
-            }, 401)
+        auth = Auth(request, App)
+        app = App.objects.filter(username=request.data['username']).first()
+
+        if not app or not auth.match_password(request.data['password'], app.password):
+            return ApiResponse.send_error('Username or Password Incorrect', 400)
 
         access_token = auth.generate_access_token(app, {})
-        return Response({
-            'status': True,
-            "data": access_token
-        }, 200)
+        return ApiResponse.send_success(access_token)

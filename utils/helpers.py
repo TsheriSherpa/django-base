@@ -42,3 +42,16 @@ def dict_get_value(key, dictionary):
         if dict_key == key:
             return dictionary.get(dict_key)
     return None
+
+
+def get_error_message(serializer):
+    """
+    Get First Error From Serailizer Errors Dict
+
+    Args:
+        serializer {Serializer}
+    Returns:
+        erro {str}
+    """
+    key = list(serializer.errors.keys())[0]
+    return list(serializer.errors.values())[0][0] + " " + key

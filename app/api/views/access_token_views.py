@@ -1,10 +1,11 @@
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
-from app.api.auth.auth import Auth
 
-from app.api.serializers.app_access_token_serializer import AppAccessTokenSerializer
 from app.models import App
+from app.api.auth.auth import Auth
+from app.api.serializers.app_access_token_serializer import AppAccessTokenSerializer
+from utils.helpers import get_error_message
 
 
 class AccessTokenView(generics.GenericAPIView):
@@ -28,8 +29,15 @@ class AccessTokenView(generics.GenericAPIView):
         Returns:
             dict: access_token and refresh_token
         """
-        auth = Auth(request,  App)
 
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                "status": False,
+                "error": get_error_message(serializer)
+            }, 422)
+
+        auth = Auth(request,  App)
         try:
             app = auth.app_from_refresh_token()
         except Exception:
