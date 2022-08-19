@@ -2,8 +2,10 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
+from drf_yasg.utils import swagger_auto_schema
+
 from app.api.permissions.authenticated_app import IsAuthenticatedApp
-from khalti.api.serializers.credential_serializer import CredentialSerializer
+from app.api.serializers.app_credential_serializer import AppCredentialSerializer
 from khalti.models import KhaltiCredential
 from stripe_card.models import StripeCredential
 
@@ -19,9 +21,15 @@ class AppCredentialView(generics.GenericAPIView):
     """
     authentication_classes = [IsAuthenticatedApp]
     throttle_classes = [UserRateThrottle]
-    serializer_class = CredentialSerializer
+    serializer_class = AppCredentialSerializer
 
-    def get(self, request):
+    @swagger_auto_schema(
+        request_body=AppCredentialSerializer,
+        responses={
+            200: AppCredentialSerializer
+        }
+    )
+    def post(self, request):
         """Get List Of Payment Available For App
 
         Args:
