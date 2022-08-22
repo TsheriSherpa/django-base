@@ -45,14 +45,14 @@ class EsewaPaymentView(generics.GenericAPIView):
         """
         self.service.create_transaction_log(
             request.app,
-            request.GET['credential_type'],
-            request.GET['environment'],
-            request.GET['amount'],
-            request.GET['reference_id'],
+            request.data['credential_type'],
+            request.data['environment'],
+            request.data['amount'],
+            request.data['reference_id'],
             get_client_ip(request),
             request.META['HTTP_USER_AGENT'],
-            request.GET['remarks'],
-            request.GET
+            request.data['remarks'],
+            request.data
         )
 
         credential = AppService.get_credential(

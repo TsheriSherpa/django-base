@@ -25,7 +25,7 @@ class EsewaMobileCallback(generics.GenericAPIView):
                 "message": "Reference aready used"
             }, 422)
         else:
-            log = self.service.create_transaction_log(
+            self.service.create_transaction_log(
                 request.data['app'] if 'app' in request.data else None,
                 request.data['credential_type'] if 'credential_type' in request.data else '',
                 request.data['environment'] if 'environment' in request.data else '',
