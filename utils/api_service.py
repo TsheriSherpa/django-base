@@ -6,12 +6,15 @@ class ApiService:
     error_code = 422
     error_message = "Something went wrong"
 
-    def setError(self, error_message="Something went wrong", error_code=422):
-        self.error_code = error_code
-        self.error_message = error_message
+    @classmethod
+    def setError(cls, error_message="Something went wrong", error_code=422):
+        cls.error_code = error_code
+        cls.error_message = error_message
 
-    def getErrorMessage(self):
-        return self.error_message
+    @classmethod
+    def getErrorMessage(cls):
+        return cls.error_message
 
-    def getErrorCode(self):
-        return self.error_code
+    @classmethod
+    def getErrorCode(cls):
+        return cls.error_code
