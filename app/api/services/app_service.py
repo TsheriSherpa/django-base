@@ -2,7 +2,7 @@
 from re import L
 from sys import api_version
 from esewa.models import EsewaCredential
-
+from imepay.models import ImePayCredential
 from khalti.models import KhaltiCredential
 from stripe_card.models import StripeCredential
 
@@ -25,5 +25,8 @@ class AppService:
 
         if gateway == 'esewa':
             return EsewaCredential.objects.filter(app=app, credential_type=credential_type.upper(), environment=environment.upper()).first()
+        
+        if gateway=='imepay':
+            return ImePayCredential.objects.filter(app=app,credential_type=credential_type.upper(),environment=environment.upper()).first()
 
         raise Exception("Unknown Payment Gateway")
