@@ -21,7 +21,9 @@ class WebPaymentSerializer(serializers.Serializer):
         Serializer (serializers): serializers
     """
     amount = serializers.IntegerField(required=True)
-    invoice_no = serializers.CharField(required=True, max_length=50)
+    reference_id = serializers.CharField(required=True, max_length=50)
     product_details = ProductDetailSerilizer(many=True)
     remarks = serializers.CharField(required=True, max_length=255)
     return_url = serializers.CharField(required=True, max_length=255)
+    credential_type = serializers.CharField(required=True, max_length=255)
+    environment = serializers.CharField(required=True, max_length=255)

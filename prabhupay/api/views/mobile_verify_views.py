@@ -5,14 +5,16 @@ from drf_yasg.utils import swagger_auto_schema
 
 from app.api.permissions.authenticated_app import IsAuthenticatedApp
 from app.api.services.app_service import AppService
-from prabhupay.api.serializers.web_payment_serializers import WebPaymentSerializer
+from prabhupay.api.serializers.web_verify_serializers import WebVerifySerializer
 from prabhupay.api.services.PrabhupayService import PrabhupayService
+from prabhupay.models import PrabhupayTransaction
+from stripe_card.models import TransactionStatus
 from utils.api_response import ApiResponse
-from utils.helpers import get_client_ip, get_error_message
+from utils.helpers import get_error_message
 
 
-class WebPaymentView(generics.GenericAPIView):
-    """ Make Payment From Prabhupay Through Web Channel
+class MobileVerifyView(generics.GenericAPIView):
+    """ Make Payment From Prabhupay Through Mobile Channel
 
     Args:
         generics (GenericAPIView): GenericAPIView
@@ -22,39 +24,40 @@ class WebPaymentView(generics.GenericAPIView):
     """
     service = None
     throttle_classes = [UserRateThrottle]
-    serializer_class = WebPaymentSerializer
+    serializer_class = WebVerifySerializer
     authentication_classes = [IsAuthenticatedApp]
 
     def __init__(self):
         super().__init__()
-        self.service = PrabhupayService()
 
     @swagger_auto_schema(
-        request_body=WebPaymentSerializer,
+        request_body=WebVerifySerializer,
         responses={
             200: str({
                 "status": True,
                 "data": {
                     "status": "00",
                     "success": True,
-                    "message": "Successful Operation",
+                    "message": "Operation Success",
                     "data": {
-                        "redirectionUrl": "https://stageepayment.prabhupay.com/?processId=fa8c5d8b-690a-4553-883d-9de6b503d85e",
-                        "processId": "fa8c5d8b-690a-4553-883d-9de6b503d85e"
+                        "amount": 100.0,
+                        "charge": 0.0,
+                        "invoiceNo": "sdsxfsedf",
+                        "transactionId": "223408220644150604"
                     },
-                    "transactionId": "223408220603150601"
+                    "note": None
                 }
             })
         }
     )
     def post(self, request):
-        """Make payment from prabhupay web channel
+        """Make payment from prabhupay mobile channel
 
         Args:
             request (request): django request
 
         Returns:
-            dict: 
+            dict:
         """
 
         serializer = self.get_serializer(data=request.data)
@@ -64,29 +67,28 @@ class WebPaymentView(generics.GenericAPIView):
         credential = AppService.get_credential(
             request.app, 'prabhupay', request.data['credential_type'], request.data['environment'])
 
-        log = self.service.create_transaction_log(
-            request.app,
-            request.data.get('credential_type'),
-            request.data.get('environment'),
-            request.data.get('amount'),
+        response = PrabhupayService.verify_mobile_payment(
+            credential,
             request.data.get('reference_id'),
-            request.data.get('product_details'),
-            get_client_ip(request),
-            request.META['HTTP_USER_AGENT'],
-            request.data.get('remarks'),
-            request.data
         )
 
-        response = self.service.initiate_transaction(
-            credential,
-            log.amount,
-            log.reference_id,
-            log.product_details,
-            log.remarks,
-            request.data.get("return_url")
-        )
+        if not response:
+            return ApiResponse.send_error(
+                PrabhupayService.getErrorMessage(),
+                PrabhupayService.getErrorCode())
+
+        log = PrabhupayTransaction.objects.filter(
+            reference_id=request.data.get('reference_id')).first()
 
         if response['status'] == "00":
+            log.message = response['message']
+            log.transaction_id = response['data']['transactionId']
+            log.transaction_status = TransactionStatus.COMPLETED.value
+            log.save()
             return ApiResponse.send_success(response)
 
-        return ApiResponse.send_success(response['message'])
+        log.transaction_status = TransactionStatus.FAILED.value
+        log.message = response['message']
+        log.save()
+
+        return ApiResponse.send_error(response['message'])

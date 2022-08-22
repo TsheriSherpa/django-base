@@ -1,3 +1,4 @@
+from statistics import mode
 from django.db import models
 from app.models import App
 from stripe_card.models import Environment, Transaction, TransactionStatus
@@ -13,9 +14,9 @@ class PrabhupayTransaction(models.Model, Transaction):
     transaction_status = models.CharField(
         max_length=255, choices=TransactionStatus.choices())
     remarks = models.CharField(max_length=255)
+    product_details = models.JSONField(null=True)
     message = models.CharField(max_length=255, null=True)
     transaction_date = models.DateTimeField(auto_now_add=True)
-    customer_email = models.CharField(max_length=255, null=True)
     request_ip = models.CharField(max_length=255, null=True)
     user_agent = models.CharField(max_length=255, null=True)
     is_test = models.BooleanField(
@@ -24,6 +25,7 @@ class PrabhupayTransaction(models.Model, Transaction):
         max_length=255, null=True)
     customer_name = models.CharField(max_length=255, null=True)
     customer_phone = models.CharField(max_length=15, null=True)
+    customer_email = models.CharField(max_length=255, null=True)
     meta_data = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -32,8 +34,8 @@ class PrabhupayTransaction(models.Model, Transaction):
 class PrabhupayCredential(models.Model):
     app = models.ForeignKey(App, on_delete=models.RESTRICT)
     base_url = models.CharField(max_length=255)
-    secret_key = models.CharField(max_length=255)
-    public_key = models.CharField(max_length=255)
+    merchant_id = models.CharField(max_length=255)
+    merchant_password = models.CharField(max_length=255)
     credential_type = models.CharField(
         max_length=255, verbose_name="Credential Used For", null=True)
     environment = models.CharField(
