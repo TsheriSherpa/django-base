@@ -124,7 +124,7 @@ class PrabhupayService(ApiService):
             credential.base_url + "/api/EPayment/Initiate", json=body, headers=headers).json()
 
     @classmethod
-    def verify_web_payment(cls, credential: PrabhupayCredential, reference_id: str):
+    def verify_payment(cls, credential: PrabhupayCredential, reference_id: str):
         """Verify web payment 
 
         Args:
@@ -133,7 +133,6 @@ class PrabhupayService(ApiService):
         """
         try:
             headers = {'Content-type': 'application/json'}
-            body = body
             body = {
                 "invoiceNo": reference_id,
                 "merchantId": credential.merchant_id,

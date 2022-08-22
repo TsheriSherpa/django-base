@@ -5,7 +5,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from app.api.permissions.authenticated_app import IsAuthenticatedApp
 from app.api.services.app_service import AppService
-from prabhupay.api.serializers.web_verify_serializers import WebVerifySerializer
+from prabhupay.api.serializers.payment_verify_serializers import PaymentVerifySerializer
 from prabhupay.api.services.PrabhupayService import PrabhupayService
 from prabhupay.models import PrabhupayTransaction
 from stripe_card.models import TransactionStatus
@@ -13,8 +13,8 @@ from utils.api_response import ApiResponse
 from utils.helpers import get_error_message
 
 
-class WebVerifyView(generics.GenericAPIView):
-    """ Make Payment From Prabhupay Through Web Channel
+class PaymentVerifyView(generics.GenericAPIView):
+    """ Make Payment From Prabhupay 
 
     Args:
         generics (GenericAPIView): GenericAPIView
@@ -24,14 +24,14 @@ class WebVerifyView(generics.GenericAPIView):
     """
     service = None
     throttle_classes = [UserRateThrottle]
-    serializer_class = WebVerifySerializer
+    serializer_class = PaymentVerifySerializer
     authentication_classes = [IsAuthenticatedApp]
 
     def __init__(self):
         super().__init__()
 
     @swagger_auto_schema(
-        request_body=WebVerifySerializer,
+        request_body=PaymentVerifySerializer,
         responses={
             200: str({
                 "status": True,
@@ -51,7 +51,7 @@ class WebVerifyView(generics.GenericAPIView):
         }
     )
     def post(self, request):
-        """Make payment from prabhupay web channel
+        """Make payment from prabhupay
 
         Args:
             request (request): django request
@@ -67,7 +67,7 @@ class WebVerifyView(generics.GenericAPIView):
         credential = AppService.get_credential(
             request.app, 'prabhupay', request.data['credential_type'], request.data['environment'])
 
-        response = PrabhupayService.verify_web_payment(
+        response = PrabhupayService.verify_payment(
             credential,
             request.data.get('reference_id'),
         )

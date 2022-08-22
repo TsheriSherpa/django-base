@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
 
-class WebVerifySerializer(serializers.Serializer):
+class PaymentVerifySerializer(serializers.Serializer):
     """Prabhupay web payment verify serializer
 
     Args:
