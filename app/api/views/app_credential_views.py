@@ -6,7 +6,9 @@ from drf_yasg.utils import swagger_auto_schema
 
 from app.api.permissions.authenticated_app import IsAuthenticatedApp
 from app.api.serializers.app_credential_serializer import AppCredentialSerializer
+from esewa.models import EsewaCredential
 from khalti.models import KhaltiCredential
+from prabhupay.models import PrabhupayCredential
 from stripe_card.models import StripeCredential
 
 
@@ -24,7 +26,6 @@ class AppCredentialView(generics.GenericAPIView):
     serializer_class = AppCredentialSerializer
 
     @swagger_auto_schema(
-        request_body=AppCredentialSerializer,
         responses={
             200: AppCredentialSerializer
         }
@@ -45,11 +46,23 @@ class AppCredentialView(generics.GenericAPIView):
         khaltis = KhaltiCredential.objects.filter(
             app_id=request.app.id)
 
+        prabhupays = PrabhupayCredential.objects.filter(
+            app_id=request.app.id)
+
+        esewas = EsewaCredential.objects.filter(
+            app_id=request.app.id)
+
         if stripe:
             payment_credentials.append(stripe.serialize())
 
         for khalti in khaltis:
             payment_credentials.append(khalti.serialize())
+
+        for prabhupay in prabhupays:
+            payment_credentials.append(prabhupay.serialize())
+
+        for esewa in esewas:
+            payment_credentials.append(esewa.serialize())
 
         return Response({
             'status': True,
