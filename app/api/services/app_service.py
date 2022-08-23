@@ -1,4 +1,5 @@
 from esewa.models import EsewaCredential
+from imepay.models import ImePayCredential
 from khalti.models import KhaltiCredential
 from prabhupay.models import PrabhupayCredential
 from stripe_card.models import StripeCredential
@@ -22,6 +23,9 @@ class AppService:
 
         if gateway == 'esewa':
             return EsewaCredential.objects.filter(app=app, credential_type=credential_type.upper(), environment=environment.upper()).first()
+        
+        if gateway=='imepay':
+            return ImePayCredential.objects.filter(app=app,credential_type=credential_type.upper(),environment=environment.upper()).first()
 
         if gateway == 'prabhupay':
             return PrabhupayCredential.objects.filter(app=app, credential_type=credential_type.upper(), environment=environment.upper()).first()

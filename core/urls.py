@@ -57,6 +57,6 @@ urlpatterns = [
     path('api/v1/khalti/', include('khalti.api.urls')),
     path('api/v1/stripe/', include('stripe_card.api.urls')),
     path('api/v1/esewa/', include('esewa.api.urls')),
+    path('api/v1/imepay/', include('imepay.api.urls')),
     path('api/v1/prabhupay/', include('prabhupay.api.urls')),
-
 ]
