@@ -4,7 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 RUN apk update \
-    && apk add --virtual python3-dev musl-dev gcc build-base \
+    && apk add --virtual .build-deps python3-dev musl-dev gcc  build-base \
     && apk add --no-cache mariadb-dev
 
 RUN pip install --upgrade pip

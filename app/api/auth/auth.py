@@ -1,6 +1,5 @@
 import json
 from datetime import datetime, timedelta
-from os import access
 
 from rest_framework import exceptions
 
@@ -133,7 +132,7 @@ class Auth:
         """
         return CryptService.encrypt(password)
 
-    def generate_access_token(self, app, message: dict) -> dict:
+    def generate_access_token(self, app, message: dict, refresh_token=None) -> dict:
         """Generate access_token and refresh token for app
 
         Args:
@@ -143,18 +142,21 @@ class Auth:
             dict: access_token and refresh_token dict
         """
         access_token_payload = self.make_token_payload(
-            app, 'access_token', message)
+            app, message)
         access_token = CryptService.encrypt(access_token_payload)
 
         refresh_token_payload = self.make_token_payload(
-            app, 'access_token', message, access_token)
+            app, message, access_token)
+
+        if not refresh_token:
+            refresh_token = CryptService.encrypt(refresh_token_payload)
 
         return {
             'access_token': access_token,
-            'refresh_token': CryptService.encrypt(refresh_token_payload)
+            'refresh_token': refresh_token
         }
 
-    def make_token_payload(self, app, type, message: dict, access_token=None) -> dict:
+    def make_token_payload(self, app, message: dict, access_token=None) -> dict:
         """Generate body payload for token
 
         Args:
@@ -167,11 +169,26 @@ class Auth:
             dict: token body payload
         """
         return json.dumps({
-            "type": type,
             "app_id": app.id,
             "message": message,
             "username": app.username,
             "access_token": access_token if access_token else "",
+            "type": "refresh_token" if access_token else "access_token",
             "generated_at": datetime.now().strftime("%Y-%m-%d, %H:%M:%S"),
-            "valid_minutes": self.valid_minutes if type == "access_token" else self.refresh_token_valid_minutes
+            "valid_minutes": self.refresh_token_valid_minutes if access_token else self.valid_minutes
         })
+
+    def app_from_refresh_token(self) -> authentication_class:
+        try:
+            decrypted_string = CryptService.decrypt(
+                self.request.data['refresh_token'])
+        except Exception:
+            raise Exception("Invalid Refresh Token")
+
+        self.decrypted_object = json.loads(decrypted_string)
+        if self.decrypted_object['type'] != "refresh_token":
+            raise Exception("Invalid Refresh Token")
+
+        self.is_token_valid(self.decrypted_object)
+
+        return self.authentication_class.objects.filter(id=self.decrypted_object['app_id']).first()

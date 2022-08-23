@@ -1,4 +1,5 @@
 """ Helper Functions """
+from rest_framework import exceptions
 
 
 def get_client_ip(request):
@@ -42,3 +43,25 @@ def dict_get_value(key, dictionary):
         if dict_key == key:
             return dictionary.get(dict_key)
     return None
+
+
+def get_error_message(serializer):
+    """
+    Get First Error From Serailizer Errors Dict
+
+    Args:
+        serializer {Serializer}
+    Returns:
+        erro {str}
+    """
+    key = list(serializer.errors.keys())[0]
+    error = list(serializer.errors.values())[0][0]
+
+    if type(error) is exceptions.ErrorDetail:
+        error = str(list(serializer.errors.values())[0][0])
+
+    while type(error) is not str:
+        key = list(error.keys())[0]
+        error = str(list(error.values())[0][0])
+
+    return error.replace("This", key)

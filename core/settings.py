@@ -11,7 +11,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "jlksoi2uoiu23423498023$@#$@#42341"),
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG")
@@ -34,7 +34,8 @@ INSTALLED_APPS = [
     'khalti',
     'stripe_card',
     'esewa',
-    'imepay'
+    'imepay',
+    'prabhupay'
 ]
 
 MIDDLEWARE = [
@@ -135,8 +136,35 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
 }
 
+# Application Base Url
 BASE_URL = os.getenv("BASE_URL")
+
+# API secret key for app api authentication
 APP_API_SECRET = os.getenv(
     'APP_API_SECRET', 'S-6BYO_iYihXwB89gdLwCl2WWCRrA5ITSFNrexAV-hA=')
+
+# Swagger
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'App Auth': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Auth-Token'
+        },
+        'Dashboard Auth': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Auth-Token'
+        },
+        'Admin Auth': {
+            'type': 'basic',
+            'in': 'header'
+        }
+    },
+    'USE_SESSION_AUTH': False
+}
