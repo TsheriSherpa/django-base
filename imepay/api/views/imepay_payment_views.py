@@ -28,9 +28,11 @@ class ImepayPaymentView(generics.GenericAPIView):
 
         credential=AppService.get_credential(request.app,'imepay',request.data['credential_type'],request.data['environment'])
         token=self.service.fetch_payment_token(request,credential)
+        payload=self.service.generate_payload(token,credential,request.data)
         return Response({
             "status":True,
-            "data":token['TokenId']
+            "data":payload,
+            "token":token
         })
 
 

@@ -22,8 +22,8 @@ class ImePayService(ApiService):
             token=(credential.api_username+ ":" +credential.password).encode('ascii')
             data = {
                     'MerchantCode': credential.merchant_code, 
-                    'RefId': "250",
-                    'Amount': 120
+                    'RefId': request.data['ref'],
+                    'Amount': request.data['amount']
             }
             headers = {
                     'Authorization': 'Basic '+ base64.b64encode(token).decode(),
@@ -32,8 +32,28 @@ class ImePayService(ApiService):
                 }
             res = requests.post(url, data=json.dumps(data), headers=headers)
             return json.loads(res.text)
-        except:
-            pass
+        except Exception as e:
+            return super().set_error("Unable to fetch payload", 422)
+            
+    
+    @classmethod
+    def generate_payload(cls, token, credential,data):
+        """Generate payload for topup transaction
+
+        Args:
+            token {dict}
+            amount {float}
+        Returns:
+            payload {str}
+        """
+        callback_url = data['success_url']
+        cancel_url = callback_url
+        payload = (token['TokenId']+'|'+credential.merchant_code+'|' \
+            +token['RefId']+'|'+data['amount']+'|'+'GET' \
+            +'|'+callback_url+'|'+cancel_url
+        ).encode('ascii')
+
+        return base64.b64encode(payload)
 
 
 
