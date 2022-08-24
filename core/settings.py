@@ -35,7 +35,8 @@ INSTALLED_APPS = [
     'stripe_card',
     'esewa',
     'imepay',
-    'prabhupay'
+    'prabhupay',
+    'fonepay',
 ]
 
 MIDDLEWARE = [
