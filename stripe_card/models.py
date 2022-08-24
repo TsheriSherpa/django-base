@@ -9,6 +9,7 @@ class TransactionStatus(Enum):
     PENDING = "PENDING"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
 
     @classmethod
     def choices(cls) -> tuple:
@@ -26,7 +27,7 @@ class Environment(Enum):
 
 class Transaction():
     def isSuccess(self) -> bool:
-        return True if self.transaction_status == TransactionStatus.COMPLETED else False
+        return True if self.transaction_status == TransactionStatus.COMPLETED.value else False
 
 
 class StripeTransaction(models.Model, Transaction):

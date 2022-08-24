@@ -18,7 +18,7 @@ class PaymentView(generics.GenericAPIView):
         generics (GenericAPIView): GenericAPIView
 
     Returns:
-        Response: Redirect to web view
+        Response: Django rest framework response 
     """
     authentication_classes = [IsAuthenticatedApp]
     throttle_classes = [UserRateThrottle]

@@ -1,14 +1,16 @@
 """ Fonepay  Utility Class """
 
+import hmac
+import hashlib
+from urllib.parse import urlencode
+from datetime import datetime
+
+from django.conf import settings
 
 from utils.helpers import dict_get_value
 from utils.api_service import ApiService
 from stripe_card.models import TransactionStatus
 from fonepay.models import FonepayCredential, FonepayTransaction
-import hmac
-import hashlib
-from urllib.parse import urlencode
-from datetime import datetime
 
 
 class FonepayService(ApiService):
@@ -68,32 +70,30 @@ class FonepayService(ApiService):
         Returns:
             params (dict): prepared params dict
         """
+        return_url = settings.BASE_URL + '/api/v1/fonepay/payment/callback'
         dv = cls.create_secure_hash(
             credential.secret_key,
             credential.merchant_code,
-            "P",
-            log.reference_id,
-            log.amount,
-            "NPR",
+            "P", log.reference_id,
+            log.amount, "NPR",
             datetime.now().strftime("%d/%m/%Y"),
-            log.remarks,
-            "NA",
-            log.meta_data['return_url'])
+            log.remarks, "NA", return_url
+        )
 
         return {
             "DV": dv,
             "MD": "P",
             "R2": "N/A",
             "CRN": "NPR",
+            "RU": return_url,
             "AMT": log.amount,
-            "PRN": log.reference_id,
             "R1": log.remarks,
-            "RU": log.meta_data['return_url'],
+            "PRN": log.reference_id,
             "PID": credential.merchant_code,
             "DT": datetime.now().strftime("%d/%m/%Y")
         }
 
-    @ classmethod
+    @classmethod
     def create_secure_hash(cls, secret_key, pid, md, prn, amt, crn, dt, r1, r2, ru):
         """Create secure hash using HMAC_SHA512
 
