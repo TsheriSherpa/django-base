@@ -63,6 +63,7 @@ class EsewaService(ApiService):
 
     @classmethod
     def update_transaction_log(cls, log: EsewaCredential, response, refId, error=""):
+    
         """Update Esewa Transaction Log
 
         Args:
