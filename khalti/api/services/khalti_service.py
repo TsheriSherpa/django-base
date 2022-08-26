@@ -94,5 +94,4 @@ class KhaltiService(ApiService):
 
         log.customer_name = response.user.name if success else None
         log.customer_phone = response.user.mobile if success else None
-        log.meta_data = response.json()
         log.save()

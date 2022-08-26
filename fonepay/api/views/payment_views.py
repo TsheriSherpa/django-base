@@ -53,6 +53,8 @@ class PaymentView(generics.GenericAPIView):
             get_client_ip(request),
             request.META['HTTP_USER_AGENT'],
             request.data['remarks'],
+            request.data['app_payload'],
+            request.data['app_api'],
             request.data
         )
 

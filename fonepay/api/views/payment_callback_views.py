@@ -44,6 +44,6 @@ class PaymentCallbackView(generics.GenericAPIView):
         log.save()
 
         if log.meta_data['is_mobile']:
-            return render(request, 'esewa/index.html', {'status': request.GET['RC']})
+            return render(request, 'result.html', {'status': request.GET['RC']})
 
         return HttpResponseRedirect(log.meta_data['return_url'] + "?status=" + "success" if request.GET['PS'] else "failed")
